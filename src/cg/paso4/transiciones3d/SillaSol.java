@@ -11,113 +11,109 @@ import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 import javax.media.j3d.Alpha;
 import javax.media.j3d.Background;
 import javax.media.j3d.BoundingBox;
-import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
-import javax.media.j3d.RotationInterpolator;
+import javax.media.j3d.PositionInterpolator;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
 
 public class SillaSol extends Applet {
-    
+
     // Parámetros necesarios para crear el escenario para los objetos 3D
-    private SimpleUniverse universo = null;
-    private Canvas3D lienzo = null;
-    
+    BoundingBox limites = new BoundingBox(new Point3d(-10f, -10f, -10f), new Point3d(10f, 10f, 10f));
+
     // Constantes
     private final String FONDO = "src/img/fondos/fondo_sunchair.jpg";
     private final String RUTA_OBJETO = "src\\img\\objetos\\sunchair.obj";
     private static final int FRAME_WIDTH = 1200;
     private static final int FRAME_HEIGHT = 800;
-    
-    // Inicializador
-    public SillaSol(){
-        // Configuración de container
+
+    // Inicializador - Configuración de container
+    public SillaSol() {
         setLayout(new BorderLayout());
-        GraphicsConfiguration gc = SimpleUniverse.getPreferredConfiguration();
-        lienzo = new Canvas3D(gc);
+        GraphicsConfiguration configuracionGrafica = SimpleUniverse.getPreferredConfiguration();
+        Canvas3D lienzo = new Canvas3D(configuracionGrafica);
         add("Center", lienzo);
-        universo = new SimpleUniverse(lienzo);
-        BranchGroup escena = crearEscenarioGrafico(); 
-        universo.addBranchGraph(escena);
-    }
-    
-    private BranchGroup crearEscenarioGrafico(){
-        BranchGroup objetoRaiz = new BranchGroup();
-        BoundingSphere fronteras = new BoundingSphere(new Point3d(0,0,0),200);
-        TextureLoader archivo = new TextureLoader(FONDO, this);
-        Background fondo = new Background(archivo.getImage());
-        fondo.setApplicationBounds(fronteras);
-        objetoRaiz.addChild(fondo);
-        objetoRaiz.addChild(modelarObjeto());
-        return objetoRaiz;
-    }
-    
-    private BranchGroup modelarObjeto(){
-        // Definir ubicación y tamaño del objeto
-        BranchGroup objetoRaiz = new BranchGroup();
-        TransformGroup grupoPrincipal = new TransformGroup();
-        Transform3D transformacion3d = new Transform3D();
-        transformacion3d.setTranslation(new Vector3d(0.0,0.0,-1)); //define posicion del objeto
-        transformacion3d.setScale(0.001); //define el tamaño del objeto
-        grupoPrincipal.setTransform(transformacion3d);
-        TransformGroup grupoProducto = new TransformGroup();
-        grupoProducto.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        grupoProducto.addChild(cargarObjeto(RUTA_OBJETO));
-        
-        definirTransición(grupoProducto);
-        
-        grupoPrincipal.addChild(grupoProducto);
-        objetoRaiz.addChild(grupoPrincipal);
-        objetoRaiz.compile();
-        
-        return objetoRaiz;
+        BranchGroup grupoEscena = modelarObjeto();
+        SimpleUniverse universe = new SimpleUniverse(lienzo);
+        universe.getViewingPlatform().setNominalViewingTransform();
+        universe.addBranchGraph(grupoEscena);
     }
 
-        
-    // Método para definir la transición del objeto
-    private void definirTransición(TransformGroup escenaTG) {
-        Alpha rotacionAlpha = new Alpha(-1,Alpha.INCREASING_ENABLE,0,0,4000,0,0,0,0,0);
-        
-        Transform3D yAxis = new Transform3D();
-        RotationInterpolator rotar = new RotationInterpolator(rotacionAlpha,escenaTG,yAxis,0.0f,(float) Math.PI*2.0f);
-        BoundingBox limites = new BoundingBox(new Point3d(-1000,-1000,-1000),new Point3d(100,100,100));
-        rotar.setSchedulingBounds(limites);
-        escenaTG.addChild(rotar);
+    // Definir ubicación y tamaño del objeto
+    private BranchGroup modelarObjeto() {
+        BranchGroup objetoRaiz = new BranchGroup();
+        objetoRaiz.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        objetoRaiz.addChild(crearFondo());//se carga la imagen de fondo correspondiente
+        TransformGroup grupoPrincipal = new TransformGroup();
+        grupoPrincipal.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        objetoRaiz.addChild(grupoPrincipal);
+
+        definirTransicion(grupoPrincipal);
+
+        return objetoRaiz;
     }
     
+    private TransformGroup crearFondo() {
+        TransformGroup fondo = new TransformGroup();
+        TextureLoader tlfondo = new TextureLoader(FONDO, this);
+//        fondo.addChild(util.aplicarFondo(tlfondo, limites));//aplica el fondo
+        Background background = new Background();
+        background.setImage(tlfondo.getImage());
+        background.setImageScaleMode(Background.SCALE_FIT_ALL);
+        background.setApplicationBounds(limites);
+        fondo.addChild(background);
+
+        return fondo;
+    }
+
+    // Método para definir la transición del objeto
+    private void definirTransicion(TransformGroup grupoPrincipal) {
+        Alpha alpha = new Alpha(-1, Alpha.INCREASING_ENABLE, 0, 0, 10000, 0, 0, 0, 0, 0);
+        Transform3D transformacion3D = new Transform3D();
+        PositionInterpolator desplazar = new PositionInterpolator(alpha, grupoPrincipal, transformacion3D, -5f, 5f);
+        desplazar.setSchedulingBounds(limites);
+        grupoPrincipal.addChild(desplazar);
+        TransformGroup grupoProducto = new TransformGroup();
+        Transform3D transform3DEscala = new Transform3D();
+        transform3DEscala.setScale(0.3);
+        grupoProducto.setTransform(transform3DEscala);
+//        grupoProducto.setTransform(util.crearScale(0.4));
+        grupoPrincipal.addChild(grupoProducto);
+        Scene escena = cargarObjeto(RUTA_OBJETO);//se carga el modelo 3d obj
+        grupoProducto.addChild(escena.getSceneGroup());
+    }
+
+
+
     // Método para cargar el objeto
-    private BranchGroup cargarObjeto(String filename){
-        BranchGroup objetoRaiz = new BranchGroup();
-        TransformGroup grupo = new TransformGroup();
-        ObjectFile cargar = new ObjectFile();
-        
-        Scene s = null;
-        File archivo = new java.io.File(filename);
-        
+    private Scene cargarObjeto(String ruta) {
+        ObjectFile file = new ObjectFile();
+        file.setFlags(ObjectFile.RESIZE);
+        Scene escena = null;
         try {
-           s = cargar.load(archivo.toURI().toURL());
-        } catch(IncorrectFormatException | ParsingErrorException | FileNotFoundException | MalformedURLException e) {
+//            escena = file.load(nombreArchivo == null ? ruta : nombreArchivo);
+            escena = file.load(ruta);
+        } catch (FileNotFoundException e) {
+            System.err.println(e);
+            System.exit(1);
+        } catch (ParsingErrorException e) {
+            System.err.println(e);
+            System.exit(1);
+        } catch (IncorrectFormatException e) {
             System.err.println(e);
             System.exit(1);
         }
-        grupo.addChild(s.getSceneGroup());
-        objetoRaiz.addChild(grupo);
-        objetoRaiz.compile();
-        
-        return objetoRaiz;
+        return escena;
     }
-        
-    public static void main (String[] args){
-        SillaSol ejecutar = new SillaSol();
-        Frame ventana = new MainFrame(ejecutar, FRAME_WIDTH, FRAME_HEIGHT);
+
+    public static void main(String[] args) {
+        SillaSol sillaSol = new SillaSol();
+        Frame frame = new MainFrame(sillaSol, FRAME_WIDTH, FRAME_HEIGHT);
     }
 }

@@ -64,19 +64,19 @@ public class Asador extends Applet {
     private BranchGroup modelarObjeto(){
         // Definir ubicación y tamaño del objeto
         BranchGroup objetoRaiz = new BranchGroup();
-        TransformGroup grupoPrincipal = new TransformGroup();
+        TransformGroup grupo = new TransformGroup();
         Transform3D transformacion3d = new Transform3D();
         transformacion3d.setTranslation(new Vector3d(0.0,0.0,-1)); //define posicion del objeto
         transformacion3d.setScale(0.002); //define el tamaño del objeto
-        grupoPrincipal.setTransform(transformacion3d);
-        TransformGroup grupoProducto = new TransformGroup();
-        grupoProducto.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        grupoProducto.addChild(cargarObjeto(RUTA_OBJETO));
+        grupo.setTransform(transformacion3d);
+        TransformGroup producto = new TransformGroup();
+        producto.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        producto.addChild(cargarObjeto(RUTA_OBJETO));
         
-        definirTransición(grupoProducto);
+        definirTransición(producto);
         
-        grupoPrincipal.addChild(grupoProducto);
-        objetoRaiz.addChild(grupoPrincipal);
+        grupo.addChild(producto);
+        objetoRaiz.addChild(grupo);
         objetoRaiz.compile();
         
         return objetoRaiz;
@@ -95,13 +95,13 @@ public class Asador extends Applet {
     }
     
     // Método para cargar el objeto
-    private BranchGroup cargarObjeto(String filename){
+    private BranchGroup cargarObjeto(String nombreArchivo){
         BranchGroup objetoRaiz = new BranchGroup();
         TransformGroup grupo = new TransformGroup();
         ObjectFile cargar = new ObjectFile();
         
         Scene s = null;
-        File archivo = new java.io.File(filename);
+        File archivo = new java.io.File(nombreArchivo);
         
         try {
            s = cargar.load(archivo.toURI().toURL());
