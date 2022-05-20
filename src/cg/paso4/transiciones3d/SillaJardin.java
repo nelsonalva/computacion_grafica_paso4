@@ -66,7 +66,7 @@ public class SillaJardin extends Applet {
         BranchGroup objetoRaiz = new BranchGroup();
         TransformGroup grupoPrincipal = new TransformGroup();
         Transform3D transformacion3d = new Transform3D();
-        transformacion3d.setTranslation(new Vector3d(0.0, 0.0, -1)); //define posicion del objeto
+        transformacion3d.setTranslation(new Vector3d(0.0, -0.2, -1)); //define posicion del objeto
         transformacion3d.setScale(0.001); //define el tamaño del objeto
         grupoPrincipal.setTransform(transformacion3d);
         TransformGroup grupoProducto = new TransformGroup();
@@ -84,7 +84,7 @@ public class SillaJardin extends Applet {
 
     // Método para definir la transición del objeto
     private void definirTransicion(TransformGroup grupoProducto) {
-        Alpha rotacionAlpha = new Alpha(-1, Alpha.INCREASING_ENABLE, 0, 0, 4000, 0, 0, 0, 0, 0);
+        Alpha rotacionAlpha = new Alpha(-1, Alpha.INCREASING_ENABLE, 0, 0, 4000, 0, 3000, 0, 0, 0);
 
         Transform3D yAxis = new Transform3D();
         RotationInterpolator rotar = new RotationInterpolator(rotacionAlpha, grupoProducto, yAxis, 0.0f, (float) Math.PI * 2.0f);
