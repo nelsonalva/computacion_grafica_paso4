@@ -26,7 +26,6 @@ public class Mesa extends Applet {
 
     // Parámetros necesarios para crear el escenario para los objetos 3D
     BoundingBox limites = new BoundingBox(new Point3d(-10f, -10f, -10f), new Point3d(10f, 10f, 10f));
-//    BoundingBox limites = new BoundingBox(new Point3d(-2f, -2f, -2f), new Point3d(2f, 2f, 2f));
 
     // Constantes
     private final String FONDO = "src/img/fondos/fondo_mesa.jpg";

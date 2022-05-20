@@ -38,7 +38,6 @@ public class Asador extends Applet {
     private static final int FRAME_WIDTH = 1200;
     private static final int FRAME_HEIGHT = 800;
 
-    // Inicializador
     public Asador() {
         // Configuración de container
         setLayout(new BorderLayout());
@@ -61,13 +60,13 @@ public class Asador extends Applet {
         return objetoRaiz;
     }
 
-    private BranchGroup modelarObjeto() {
         // Definir ubicación y tamaño del objeto
+    private BranchGroup modelarObjeto() {
         BranchGroup objetoRaiz = new BranchGroup();
         TransformGroup grupo = new TransformGroup();
         Transform3D transformacion3d = new Transform3D();
-        transformacion3d.setTranslation(new Vector3d(0.0, -0.2, -1)); //define posicion del objeto
-        transformacion3d.setScale(0.0022); //define el tamaño del objeto
+        transformacion3d.setTranslation(new Vector3d(0.0, -0.2, -1));
+        transformacion3d.setScale(0.0022);
         grupo.setTransform(transformacion3d);
         TransformGroup producto = new TransformGroup();
         producto.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
@@ -116,7 +115,7 @@ public class Asador extends Applet {
     }
 
     public static void main(String[] args) {
-        Asador ejecutar = new Asador();
-        Frame ventana = new MainFrame(ejecutar, FRAME_WIDTH, FRAME_HEIGHT);
+        Asador asador = new Asador();
+        Frame ventana = new MainFrame(asador, FRAME_WIDTH, FRAME_HEIGHT);
     }
 }

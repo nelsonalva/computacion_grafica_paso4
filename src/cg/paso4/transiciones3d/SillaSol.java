@@ -76,7 +76,7 @@ public class SillaSol extends Applet {
     private void definirTransicion(TransformGroup grupoPrincipal) {
         Alpha alpha = new Alpha(-1, Alpha.INCREASING_ENABLE, 0, 0, 10000, 0, 0, 0, 0, 0);
         Transform3D transformacion3D = new Transform3D();
-        PositionInterpolator desplazar = new PositionInterpolator(alpha, grupoPrincipal, transformacion3D, -5f, 5f);
+        PositionInterpolator desplazar = new PositionInterpolator(alpha, grupoPrincipal, transformacion3D, -1f, 1f);
         desplazar.setSchedulingBounds(limites);
         grupoPrincipal.addChild(desplazar);
         TransformGroup grupoProducto = new TransformGroup();
